@@ -1,6 +1,7 @@
 #include <p18f4520.h>
 int Counter_01 = 0;
 int Counter_02 = 0;
+int ADC_Result = 0;
 
 #pragma interrupt high_isr
 void high_isr(void)
@@ -37,6 +38,10 @@ void main (void)
 {
 
 	int Count = 0;
+	TRISA = 0x11;
+	ADCON0 = 0x01;	
+	ADCON1 = 0x0E;	
+	ADCON2 = 0x29; 
 
 	TRISB = 0xF0;
 	PORTB = 0x00;
@@ -52,6 +57,19 @@ void main (void)
 
 	while(1)
 	{
+		ADCON0bits.GO = 1;	
+		while(ADCON0bits.GO);	
+
+		ADC_Result = ADRESH;	
+		if(ADC_Result<100)	
+		{	
+			PORTBbits.RB3 = 0;	
+		}	
+		else if(100<=ADC_Result)	
+		{	
+			PORTBbits.RB3 = 1;	
+		}
+
 		PORTB ^= 0x01;
 		for(Count=0; Count<10000; Count++);
 
